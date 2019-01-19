@@ -1,0 +1,21 @@
+version: "2"
+
+services:
+
+  nexus:
+    image: akisys/nexus3
+    build:
+      context: .
+    environment:
+      NEXUS_WEB_PORT: 8080
+      NEXUS_WEB_PORT_SSL: 8443
+      NEXUS_WEB_CONTEXT: "/nexus"
+      JVM_HEAP_MEM: 512M
+      JVM_DIR_MEM: 512M
+    volumes:
+      - $PWD/nexus-data:/nexus-data
+    ports:
+      - 8443:8443
+    mem_limit: 2g
+    mem_reservation: 1g
+
