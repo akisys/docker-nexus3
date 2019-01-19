@@ -24,6 +24,7 @@ echo '
 application-port=
 application-port-ssl=
 application-host=0.0.0.0
+nexus-context-path=/
 nexus-args=${jetty.etc}/jetty.xml,${jetty.etc}/jetty-http.xml,${jetty.etc}/jetty-requestlog.xml,${jetty.etc}/jetty-https.xml
 ssl.etc=${karaf.data}/etc/ssl
 ' | tee -a etc/nexus.properties
