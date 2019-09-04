@@ -1,0 +1,8 @@
+#!/bin/sh
+
+set -fuxe
+
+cd /
+echo "Checking Nexus data directory"
+mkdir -p "$NEXUS_DATA"
+

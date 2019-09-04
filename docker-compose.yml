@@ -12,9 +12,10 @@ services:
       NEXUS_WEB_CONTEXT: "/nexus"
       JVM_HEAP_MEM: 512M
       JVM_DIR_MEM: 512M
-    volumes:
-      - $PWD/nexus-data:/nexus-data
+    #volumes:
+    #  - $PWD/nexus-data:/nexus-data
     ports:
+      - 8080:8080
       - 8443:8443
     mem_limit: 2g
     mem_reservation: 1g

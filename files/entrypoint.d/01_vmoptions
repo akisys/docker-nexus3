@@ -1,0 +1,18 @@
+#!/bin/sh
+
+set -fuxe
+
+cd "$NEXUS_APPDIR/bin" || exit 1
+echo "Patching default JVM runtime options"
+sed \
+  -E \
+  -e "s/(-XX:MaxRAM=).*/\1${JVM_MAX_MEM}/" \
+  -e "s/-Xms.*/-Xms${JVM_HEAP_MEM}/" \
+  -e "s/-Xmx.*/-Xmx${JVM_HEAP_MEM}/" \
+  -e "s/(-XX:MaxDirectMemorySize=).*/\1${JVM_DIR_MEM}/" \
+  -e "s;(-XX:LogFile=).*;\1${NEXUS_DATA}/log/jvm.log;" \
+  -e "s;(-Dkaraf.data=).*;\1${NEXUS_DATA};" \
+  -e "s;(-Djava.io.tmpdir=).*;\1${NEXUS_DATA}/tmp;" \
+  -ibak \
+  nexus.vmoptions
+

@@ -5,20 +5,21 @@ JVM_FIX_OPS="
 -XX:+UseCGroupMemoryLimitForHeap
 "
 
-cd "$NEXUS_APPDIR"
+cd "${NEXUS_APPDIR}" || exit 1
 
-# fix some java 8 docker memory constraint detection options
-set +e
-for _jvmfix in "$JVM_FIX_OPS"; do
-  if [ -n "$_jvmfix" ]; then
-    grep "$_jvmfix" "$NEXUS_APPDIR/bin/nexus.vmoptions" || (echo "$_jvmfix" | tee -a "$NEXUS_APPDIR/bin/nexus.vmoptions")
+echo "fix some java 8 docker memory constraint detection options"
+
+for _jvmfix in "${JVM_FIX_OPS}"; do
+  if [ -n "${_jvmfix}" ]; then
+    grep "${_jvmfix}" "${NEXUS_APPDIR}/bin/nexus.vmoptions" || \
+      (echo "${_jvmfix}" | tee -a "${NEXUS_APPDIR}/bin/nexus.vmoptions")
   fi
 done
-set -e
 
-# get the intial nexus.properties in place
+echo "get the intial nexus.properties in place"
+
 #cp etc/nexus-default.properties etc/nexus.properties
-touch etc/nexus.properties
+touch "${NEXUS_APPDIR}/etc/nexus.properties"
 echo '
 ## Nexus customizations
 application-port=
@@ -27,10 +28,9 @@ application-host=0.0.0.0
 nexus-context-path=/
 nexus-args=${jetty.etc}/jetty.xml,${jetty.etc}/jetty-http.xml,${jetty.etc}/jetty-requestlog.xml,${jetty.etc}/jetty-https.xml
 ssl.etc=${karaf.data}/etc/ssl
-' | tee -a etc/nexus.properties
+' | tee -a "${NEXUS_APPDIR}/etc/nexus.properties"
 
 cd /
 
 chown -R "${NEXUS_USER}:${NEXUS_GROUP}" "${NEXUS_APPDIR}"/*
-rm -f /tmp/nexus3.tgz
-rm -f "$0"
+

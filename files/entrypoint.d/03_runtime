@@ -1,0 +1,20 @@
+#!/bin/sh
+
+set -fuxe
+
+cd "$NEXUS_DATA/etc" || exit 1
+echo "Patching Nexus runtime options"
+if [ ! -f "$NEXUS_DATA/etc/nexus.properties" ];
+then
+  mv "$NEXUS_APPDIR/etc/nexus.properties" "$NEXUS_DATA/etc/nexus.properties"
+fi
+sed \
+  -E \
+  -e "s;(application-port=).*;\1${NEXUS_WEB_PORT};" \
+  -e "s;(application-port-ssl=).*;\1${NEXUS_WEB_PORT_SSL};" \
+  -e "s;(nexus-context-path=).*;\1${NEXUS_WEB_CONTEXT};" \
+  -ibak \
+  nexus.properties
+
+chown -R "$NEXUS_UID:$NEXUS_GID" "$NEXUS_DATA"
+

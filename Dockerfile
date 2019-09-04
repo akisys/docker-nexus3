@@ -14,27 +14,45 @@ ENV \
 
 RUN set -ex \
       && apk add --no-cache wget su-exec
+
 RUN set -ex \
       && wget -O /tmp/nexus3.tgz "${NEXUS_DOWNLOAD_URL}"
+
 RUN set -ex \
-      && test "$(sha256sum /tmp/nexus3.tgz | awk '{print $1}')" == "${NEXUS_DOWNLOAD_SHA256_HASH}"
+      && echo "${NEXUS_DOWNLOAD_SHA256_HASH}  /tmp/nexus3.tgz" | sha256sum -c
+
 RUN set -ex \
       && mkdir -p "$(dirname $NEXUS_APPDIR)" \
       && tar -xvf /tmp/nexus3.tgz -C"$(dirname $NEXUS_APPDIR)"/ \
       && ln -snf "/opt/nexus-${NEXUS_VERSION}" "${NEXUS_APPDIR}"
+
 RUN set -ex \
       && addgroup -g "${NEXUS_GID}" "${NEXUS_GROUP}" \
       && adduser -h "${NEXUS_DATA}" -u "${NEXUS_UID}" -s /bin/sh -D -H -G "${NEXUS_GROUP}" "${NEXUS_USER}"
 
-COPY files/ /
+COPY files/buildout/ /tmp/buildout/
+COPY files/entrypoint.d/ /entrypoint.d/
+COPY files/entrypoint.sh /
+
 ENV \
   NEXUS_WEB_PORT=8080 \
   NEXUS_WEB_PORT_SSL=8443 \
   NEXUS_WEB_CONTEXT=/ \
+  JVM_MAX_MEM=1G \
   JVM_HEAP_MEM=1200M \
   JVM_DIR_MEM=2G
 
+# run final stages of build-out
+RUN set -e \
+      && chmod +x /tmp/buildout/* \
+      && run-parts --exit-on-error /tmp/buildout \
+      && rm -rf /tmp/buildout \
+      && rm -f /tmp/nexus3.tgz
+
 RUN set -ex \
-      && /build-out.sh
+      && chmod +x /entrypoint.d/* \
+      && chmod +x /entrypoint.sh
 
 ENTRYPOINT ["/entrypoint.sh"]
+CMD [""]
+
