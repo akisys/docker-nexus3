@@ -16,14 +16,14 @@ RUN set -ex \
       && apk add --no-cache wget su-exec
 
 RUN set -ex \
-      && wget -O /tmp/nexus3.tgz "${NEXUS_DOWNLOAD_URL}"
+      && wget -q -O /tmp/nexus3.tgz "${NEXUS_DOWNLOAD_URL}"
 
 RUN set -ex \
       && echo "${NEXUS_DOWNLOAD_SHA256_HASH}  /tmp/nexus3.tgz" | sha256sum -c
 
 RUN set -ex \
       && mkdir -p "$(dirname $NEXUS_APPDIR)" \
-      && tar -xvf /tmp/nexus3.tgz -C"$(dirname $NEXUS_APPDIR)"/ \
+      && tar -xf /tmp/nexus3.tgz -C"$(dirname $NEXUS_APPDIR)"/ \
       && ln -snf "/opt/nexus-${NEXUS_VERSION}" "${NEXUS_APPDIR}"
 
 RUN set -ex \
